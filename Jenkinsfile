@@ -46,7 +46,7 @@ pipeline {
 
     stage('Deploy to App Server') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'app-server-creds',
+                withCredentials([usernamePassword(credentialsId: 'app-server',
                                                  usernameVariable: 'APP_USER',
                                                  passwordVariable: 'APP_PASS')]) {
                     script {
@@ -78,6 +78,7 @@ pipeline {
         }
     }
 }
+
 
 
 
