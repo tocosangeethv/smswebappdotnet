@@ -44,9 +44,34 @@ pipeline {
         }
     }
 
+    stage('Deploy to App Server') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'app-server-creds', usernameVariable: 'APP_USER', passwordVariable: 'APP_PASS')]) {
+                    script {
+                        def remoteServer = "20.40.52.13"
+                        def destinationPath = "\\\\${remoteServer}\\c$\\inetpub\\wwwroot\\MyApp"
+                        def localPath = "${WORKSPACE}\\publish\\*"
+
+                        // Map the remote drive
+                        bat "net use ${destinationPath} /user:%APP_USER% %APP_PASS%"
+
+                        // Copy published files
+                        bat """
+                        powershell -NoProfile -ExecutionPolicy Bypass -Command "Copy-Item -Path '${localPath}' -Destination '${destinationPath}' -Recurse -Force"
+                        """
+
+                        // Unmap remote drive (cleanup)
+                        bat "net use ${destinationPath} /delete"
+                    }
+                }
+            }
+    }
+}
+
     post {
         success {
             echo 'Build, test, and publish successful!'
         }
     }
 }
+
