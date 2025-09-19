@@ -52,7 +52,7 @@ pipeline {
                     script {
                         def remoteServer    = "20.40.52.13"
                         // Escape the $ in c$  ->  c\\$
-                        def destinationPath = "\\\\${remoteServer}\\c\\$\\inetpub\\wwwroot\\MyApp"
+                        def destinationPath = "\\\\${remoteServer}\\c\\\$\\inetpub\\wwwroot\\MyApp"
                         def localPath       = "${WORKSPACE}\\publish\\*"
 
                         // Map the admin share with credentials
@@ -78,5 +78,6 @@ pipeline {
         }
     }
 }
+
 
 
