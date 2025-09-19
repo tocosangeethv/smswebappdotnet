@@ -42,7 +42,7 @@ pipeline {
                 }
             }
         }
-    }
+    
 
     stage('Deploy to App Server') {
             steps {
@@ -78,6 +78,7 @@ pipeline {
         }
     }
 }
+
 
 
 
