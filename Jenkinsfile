@@ -46,22 +46,26 @@ pipeline {
 
     stage('Deploy to App Server') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'app-server-creds', usernameVariable: 'APP_USER', passwordVariable: 'APP_PASS')]) {
+                withCredentials([usernamePassword(credentialsId: 'app-server-creds',
+                                                 usernameVariable: 'APP_USER',
+                                                 passwordVariable: 'APP_PASS')]) {
                     script {
-                        def remoteServer = "20.40.52.13"
-                        def destinationPath = "\\\\${remoteServer}\\c$\\inetpub\\wwwroot\\MyApp"
-                        def localPath = "${WORKSPACE}\\publish\\*"
+                        def remoteServer    = "20.40.52.13"
+                        // Escape the $ in c$  ->  c\\$
+                        def destinationPath = "\\\\${remoteServer}\\c\\$\\inetpub\\wwwroot\\MyApp"
+                        def localPath       = "${WORKSPACE}\\publish\\*"
 
-                        // Map the remote drive
-                        bat "net use ${destinationPath} /user:%APP_USER% %APP_PASS%"
+                        // Map the admin share with credentials
+                        bat "net use \"${destinationPath}\" /user:%APP_USER% %APP_PASS%"
 
-                        // Copy published files
+                        // Copy the published bits
                         bat """
-                        powershell -NoProfile -ExecutionPolicy Bypass -Command "Copy-Item -Path '${localPath}' -Destination '${destinationPath}' -Recurse -Force"
+                        powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+                          "Copy-Item -Path '${localPath}' -Destination '${destinationPath}' -Recurse -Force"
                         """
 
-                        // Unmap remote drive (cleanup)
-                        bat "net use ${destinationPath} /delete"
+                        // Clean up the mapping
+                        bat "net use \"${destinationPath}\" /delete"
                     }
                 }
             }
@@ -74,4 +78,5 @@ pipeline {
         }
     }
 }
+
 
